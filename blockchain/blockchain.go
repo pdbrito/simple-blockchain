@@ -10,10 +10,10 @@ func (bc *Blockchain) AddBlock(data string) {
 	bc.Blocks = append(bc.Blocks, newBlock)
 }
 
-func NewGenesisBlock() *Block {
+func newGenesisBlock() *Block {
 	return NewBlock("A long time ago in a galaxy far far away....", []byte{})
 }
 
 func NewBlockchain() *Blockchain {
-	return &Blockchain{[]*Block{NewGenesisBlock()}}
+	return &Blockchain{[]*Block{newGenesisBlock()}}
 }
