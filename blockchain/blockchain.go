@@ -6,12 +6,12 @@ type Blockchain struct {
 
 func (bc *Blockchain) AddBlock(data string) {
 	prevBlock := bc.Blocks[len(bc.Blocks)-1]
-	newBlock := NewBlock(data, prevBlock.Hash)
+	newBlock := newBlock(data, prevBlock.Hash)
 	bc.Blocks = append(bc.Blocks, newBlock)
 }
 
 func newGenesisBlock() *Block {
-	return NewBlock("A long time ago in a galaxy far far away....", []byte{})
+	return newBlock("A long time ago in a galaxy far far away....", []byte{})
 }
 
 func NewBlockchain() *Blockchain {

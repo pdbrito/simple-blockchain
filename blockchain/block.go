@@ -14,7 +14,7 @@ type Block struct {
 	Hash          []byte
 }
 
-func (b *Block) SetHash() {
+func (b *Block) setHash() {
 	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
 	headers := bytes.Join([][]byte{b.PrevBlockHash, b.Data, timestamp}, []byte{})
 	hash := sha256.Sum256(headers)
@@ -22,7 +22,7 @@ func (b *Block) SetHash() {
 	b.Hash = hash[:]
 }
 
-func NewBlock(data string, prevBlockHash []byte) *Block {
+func newBlock(data string, prevBlockHash []byte) *Block {
 	block := &Block{
 		time.Now().Unix(),
 		[]byte(data),
@@ -30,6 +30,6 @@ func NewBlock(data string, prevBlockHash []byte) *Block {
 		[]byte{},
 	}
 
-	block.SetHash()
+	block.setHash()
 	return block
 }
