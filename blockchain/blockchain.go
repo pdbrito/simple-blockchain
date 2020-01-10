@@ -28,7 +28,7 @@ func NewBlockchain() *Blockchain {
 	return &Blockchain{[]*Block{newGenesisBlock()}}
 }
 
-const targetBits = 24
+const targetBits = 19
 
 type ProofOfWork struct {
 	block  *Block
