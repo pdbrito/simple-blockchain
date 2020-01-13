@@ -44,3 +44,16 @@ func (b *Block) Serialize() []byte {
 
 	return result.Bytes()
 }
+
+func (b *Block) Deserialize(data []byte) *Block {
+	var block Block
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+
+	err := decoder.Decode(&block)
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return &block
+}
