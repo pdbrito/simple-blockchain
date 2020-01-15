@@ -11,7 +11,7 @@ func (bc *Blockchain) AddBlock(data string) {
 }
 
 func newGenesisBlock() *Block {
-	return newBlock("A long time ago in a galaxy far far away....", []byte{})
+	return NewBlock("A long time ago in a galaxy far far away....", []byte{})
 }
 
 func NewBlockchain() *Blockchain {
