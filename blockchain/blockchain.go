@@ -98,3 +98,40 @@ func NewBlockchain() *Blockchain {
 
 	return &bc
 }
+
+type Iterator struct {
+	currentHash []byte
+	db          *bolt.DB
+}
+
+func (bc Blockchain) Iterator() *Iterator {
+	return &Iterator{bc.tip, bc.db}
+}
+
+func (i *Iterator) Next() *Block {
+	if i.currentHash == nil {
+		return nil
+	}
+
+	var block *Block
+
+	err := i.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(blocksBucket))
+
+		block = DeserializeBlock(b.Get(i.currentHash))
+
+		return nil
+	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if block.PrevBlockHash == nil {
+		i.currentHash = nil
+	} else {
+		i.currentHash = block.PrevBlockHash
+	}
+
+	return block
+}
