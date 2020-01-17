@@ -10,13 +10,13 @@ const blocksBucket = "blocks"
 
 type Blockchain struct {
 	tip []byte
-	db  *bolt.DB
+	Db  *bolt.DB
 }
 
 func (bc *Blockchain) AddBlock(data string) {
 	var lastHash []byte
 
-	err := bc.db.View(func(tx *bolt.Tx) error {
+	err := bc.Db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
 		lastHash = b.Get([]byte("1"))
 
@@ -29,7 +29,7 @@ func (bc *Blockchain) AddBlock(data string) {
 
 	newBlock := NewBlock(data, lastHash)
 
-	err = bc.db.Update(func(tx *bolt.Tx) error {
+	err = bc.Db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
 		err := b.Put(newBlock.Hash, newBlock.Serialize())
 		if err != nil {
@@ -105,7 +105,7 @@ type Iterator struct {
 }
 
 func (bc Blockchain) Iterator() *Iterator {
-	return &Iterator{bc.tip, bc.db}
+	return &Iterator{bc.tip, bc.Db}
 }
 
 func (i *Iterator) Next() *Block {
