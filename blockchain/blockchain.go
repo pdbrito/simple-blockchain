@@ -51,10 +51,6 @@ func (bc *Blockchain) AddBlock(data string) {
 	}
 }
 
-func newGenesisBlock() *Block {
-	return NewBlock("A long time ago in a galaxy far far away....", []byte{})
-}
-
 func NewBlockchain() *Blockchain {
 	var tip []byte
 	db, err := bolt.Open(dbFile, 0600, nil)

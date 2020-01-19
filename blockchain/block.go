@@ -9,16 +9,20 @@ import (
 
 type Block struct {
 	Timestamp     int64
-	Data          []byte
+	Transactions  []*Transaction
 	PrevBlockHash []byte
 	Hash          []byte
 	Nonce         int
 }
 
-func NewBlock(data string, prevBlockHash []byte) *Block {
+func newGenesisBlock() *Block {
+	return NewBlock([]*Transaction{}, []byte{})
+}
+
+func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
 	block := &Block{
 		time.Now().Unix(),
-		[]byte(data),
+		transactions,
 		prevBlockHash,
 		[]byte{},
 		0,
