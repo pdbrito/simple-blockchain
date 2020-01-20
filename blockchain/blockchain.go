@@ -1,12 +1,15 @@
 package blockchain
 
 import (
+	"fmt"
 	bolt "go.etcd.io/bbolt"
 	"log"
+	"os"
 )
 
 const dbFile = "blockchain.db"
 const blocksBucket = "blocks"
+const genesisCoinbaseData string = "I find your lack of faith disturbing"
 
 type Blockchain struct {
 	tip []byte
@@ -51,7 +54,19 @@ func (bc *Blockchain) AddBlock(data string) {
 	}
 }
 
-func NewBlockchain() *Blockchain {
+func dbExists() bool {
+	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func NewBlockchain(address string) *Blockchain {
+	if !dbExists() {
+		fmt.Println("No existing blockchain found. Create one first")
+		os.Exit(1)
+	}
+
 	var tip []byte
 	db, err := bolt.Open(dbFile, 0600, nil)
 
@@ -61,27 +76,51 @@ func NewBlockchain() *Blockchain {
 
 	err = db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
+		tip = b.Get([]byte("1"))
 
-		if b == nil {
-			genesis := newGenesisBlock()
-			b, err := tx.CreateBucket([]byte(blocksBucket))
-			if err != nil {
-				log.Panic(err)
-			}
+		return nil
+	})
 
-			err = b.Put(genesis.Hash, genesis.Serialize())
-			if err != nil {
-				log.Panic(err)
-			}
+	if err != nil {
+		log.Panic(err)
+	}
 
-			err = b.Put([]byte("1"), genesis.Hash)
-			if err != nil {
-				log.Panic(err)
-			}
-			tip = genesis.Hash
-		} else {
-			tip = b.Get([]byte("1"))
+	bc := Blockchain{tip, db}
+
+	return &bc
+}
+
+func CreateBlockchain(address string) *Blockchain {
+	if dbExists() {
+		fmt.Println("Blockchain already exists.")
+		os.Exit(1)
+	}
+
+	var tip []byte
+	db, err := bolt.Open(dbFile, 0600, nil)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		cbtx := NewCoinbaseTX(address, genesisCoinbaseData)
+		genesis := newGenesisBlock(cbtx)
+
+		b, err := tx.CreateBucket([]byte(blocksBucket))
+		if err != nil {
+			log.Panic(err)
 		}
+
+		err = b.Put(genesis.Hash, genesis.Serialize())
+		if err != nil {
+			log.Panic(err)
+		}
+
+		err = b.Put([]byte("1"), genesis.Hash)
+		if err != nil {
+			log.Panic(err)
+		}
+		tip = genesis.Hash
 
 		return nil
 	})
