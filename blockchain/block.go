@@ -15,8 +15,8 @@ type Block struct {
 	Nonce         int
 }
 
-func newGenesisBlock() *Block {
-	return NewBlock([]*Transaction{}, []byte{})
+func newGenesisBlock(coinbase *Transaction) *Block {
+	return NewBlock([]*Transaction{coinbase}, []byte{})
 }
 
 func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
