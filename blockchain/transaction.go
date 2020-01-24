@@ -27,6 +27,14 @@ type TXInput struct {
 	ScriptSig string
 }
 
+func (in TXInput) CanUnlockOutputWith(unlockingData string) bool {
+	return in.ScriptSig == unlockingData
+}
+
+func (out TXOutput) CanBeUnlockedWith(unlockingData string) bool {
+	return out.ScriptPubKey == unlockingData
+}
+
 func (tx *Transaction) SetID() {
 	var encoded bytes.Buffer
 	var hash [32]byte
