@@ -52,16 +52,16 @@ func (cli *CLI) Run() {
 		os.Exit(1)
 	}
 
-	createBlockchainCommand := flag.NewFlagSet(createBlockchainFlag, flag.ExitOnError)
+	createBlockchainCmd := flag.NewFlagSet(createBlockchainFlag, flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet(printChainFlag, flag.ExitOnError)
 	getBalanceCmd := flag.NewFlagSet(getBalanceFlag, flag.ExitOnError)
 
-	createBlockchainAddress := createBlockchainCommand.String("address", "", "Recipient of the genesis block reward")
+	createBlockchainAddress := createBlockchainCmd.String("address", "", "Recipient of the genesis block reward")
 	getBalanceAddress := getBalanceCmd.String("address", "", "Get the balance of this address")
 
 	switch os.Args[1] {
 	case createBlockchainFlag:
-		err := createBlockchainCommand.Parse(os.Args[2:])
+		err := createBlockchainCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -80,9 +80,9 @@ func (cli *CLI) Run() {
 		os.Exit(1)
 	}
 
-	if createBlockchainCommand.Parsed() {
+	if createBlockchainCmd.Parsed() {
 		if *createBlockchainAddress == "" {
-			createBlockchainCommand.Usage()
+			createBlockchainCmd.Usage()
 			os.Exit(1)
 		}
 		cli.createBlockchain(*createBlockchainAddress)
