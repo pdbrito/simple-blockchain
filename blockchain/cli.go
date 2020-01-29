@@ -19,6 +19,8 @@ const (
 	printChainUsage       string = "  %s - print all the blocks of the blockchain"
 	getBalanceFlag        string = "getbalance"
 	getBalanceUsage       string = "  %s -address <address> - calculate the balance of <address>"
+	sendFlag              string = "send"
+	sendUsage             string = "  %s -from <from> -to <to> -amount <amount> - Send <amount> from <from> to <to>"
 )
 
 func (cli *CLI) createBlockchain(address string) {
@@ -32,6 +34,7 @@ func (cli *CLI) printUsage() {
 	fmt.Println(fmt.Sprintf(createBlockchainUsage, createBlockchainFlag))
 	fmt.Println(fmt.Sprintf(printChainUsage, printChainFlag))
 	fmt.Println(fmt.Sprintf(getBalanceUsage, getBalanceFlag))
+	fmt.Println(fmt.Sprintf(sendUsage, sendFlag))
 }
 
 func (cli CLI) getBalance(address string) {
@@ -46,6 +49,15 @@ func (cli CLI) getBalance(address string) {
 	fmt.Printf("Balance of `%s` is `%d`\n", address, balance)
 }
 
+func (cli CLI) send(from, to string, amount int) {
+	bc := NewBlockchain(from)
+	defer bc.Db.Close()
+
+	tx := NewUTXOTransaction(from, to, amount, bc)
+	bc.MineBlock([]*Transaction{tx})
+	fmt.Println("Success!")
+}
+
 func (cli *CLI) Run() {
 	if len(os.Args) < 2 {
 		cli.printUsage()
@@ -55,9 +67,13 @@ func (cli *CLI) Run() {
 	createBlockchainCmd := flag.NewFlagSet(createBlockchainFlag, flag.ExitOnError)
 	printChainCmd := flag.NewFlagSet(printChainFlag, flag.ExitOnError)
 	getBalanceCmd := flag.NewFlagSet(getBalanceFlag, flag.ExitOnError)
+	sendCmd := flag.NewFlagSet(sendFlag, flag.ExitOnError)
 
 	createBlockchainAddress := createBlockchainCmd.String("address", "", "Recipient of the genesis block reward")
 	getBalanceAddress := getBalanceCmd.String("address", "", "Get the balance of this address")
+	sendFromAddress := sendCmd.String("fromAddress", "", "Address to take funds from")
+	sendToAddress := sendCmd.String("toAddress", "", "Address to send funds to")
+	sendAmount := sendCmd.Int("amount", 0, "Amount to transfer")
 
 	switch os.Args[1] {
 	case createBlockchainFlag:
@@ -72,6 +88,11 @@ func (cli *CLI) Run() {
 		}
 	case getBalanceFlag:
 		err := getBalanceCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case sendFlag:
+		err := sendCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -98,6 +119,21 @@ func (cli *CLI) Run() {
 			os.Exit(1)
 		}
 		cli.getBalance(*getBalanceAddress)
+	}
+	if sendCmd.Parsed() {
+		if *sendFromAddress == "" {
+			sendCmd.Usage()
+			os.Exit(1)
+		}
+		if *sendToAddress == "" {
+			sendCmd.Usage()
+			os.Exit(1)
+		}
+		if *sendAmount == 0 {
+			sendCmd.Usage()
+			os.Exit(1)
+		}
+		cli.send(*sendFromAddress, *sendToAddress, *sendAmount)
 	}
 }
 
