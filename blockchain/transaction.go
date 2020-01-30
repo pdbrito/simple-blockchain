@@ -92,6 +92,9 @@ func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transactio
 
 	// Build a list of outputs.
 	outputs = append(outputs, TXOutput{amount, to})
+	if acc > amount {
+		outputs = append(outputs, TXOutput{acc - amount, from})
+	}
 
 	tx := Transaction{nil, inputs, outputs}
 	tx.SetID()
