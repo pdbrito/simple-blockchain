@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/elliptic"
 	"encoding/gob"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -22,6 +23,16 @@ func NewWallets() (*Wallets, error) {
 	err := wallets.LoadFromFile()
 
 	return &wallets, err
+}
+
+// CreateWallet adds a Wallet to Wallets
+func (ws *Wallets) CreateWallet() string {
+	wallet := NewWallet()
+	address := fmt.Sprintf("%s", wallet.GetAddress())
+
+	ws.Wallets[address] = wallet
+
+	return address
 }
 
 const walletFile string = "wallet.dat"
