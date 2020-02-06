@@ -59,3 +59,21 @@ func (ws Wallets) LoadFromFile() error {
 	ws.Wallets = wallets.Wallets
 	return nil
 }
+
+// SaveToFile saves wallets to a file
+func (ws Wallets) SaveToFile() {
+	var content bytes.Buffer
+
+	gob.Register(elliptic.P256())
+
+	encoder := gob.NewEncoder(&content)
+	err := encoder.Encode(ws)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	err = ioutil.WriteFile(walletFile, content.Bytes(), 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+}
