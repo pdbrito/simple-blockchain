@@ -251,3 +251,24 @@ func (i *Iterator) Next() *Block {
 
 	return block
 }
+
+// FindTransaction finds a transaction by its ID
+func (bc *Blockchain) FindTransaction(ID []byte) (Transaction, error) {
+	bci := bc.Iterator()
+
+	for {
+		block := bci.Next()
+
+		for _, tx := range block.Transactions {
+			if bytes.Compare(tx.ID, ID) == 0 {
+				return *tx, nil
+			}
+		}
+
+		if len(block.PrevBlockHash) == 0 {
+			break
+		}
+	}
+
+	return Transaction{}, errors.New("transaction is not found")
+}
