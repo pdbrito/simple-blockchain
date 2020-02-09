@@ -35,6 +35,11 @@ func (ws *Wallets) CreateWallet() string {
 	return address
 }
 
+// GetWallet returns a Wallet by its address
+func (ws Wallets) GetWallet(address string) Wallet {
+	return *ws.Wallets[address]
+}
+
 const walletFile string = "wallet.dat"
 
 // LoadFromFile loads wallets from a file on disk
