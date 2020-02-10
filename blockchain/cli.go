@@ -38,12 +38,17 @@ func (cli *CLI) printUsage() {
 }
 
 func (cli CLI) getBalance(address string) {
+	if !ValidateAddress(address) {
+		log.Panic("error: address is not valid")
+	}
 	bc := NewBlockchain(address)
 	defer bc.Db.Close()
 
-	utxos := bc.FindUTXO(address)
 	var balance int
-	for _, out := range utxos {
+	pubKeyHash := Base58Decode([]byte(address))
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-4]
+	UTXOs := bc.FindUTXO(pubKeyHash)
+	for _, out := range UTXOs {
 		balance += out.Value
 	}
 	fmt.Printf("Balance of `%s` is `%d`\n", address, balance)
