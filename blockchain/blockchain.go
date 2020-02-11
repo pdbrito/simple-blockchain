@@ -1,7 +1,10 @@
 package blockchain
 
 import (
+	"bytes"
+	"crypto/ecdsa"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	bolt "go.etcd.io/bbolt"
 	"log"
@@ -271,4 +274,17 @@ func (bc *Blockchain) FindTransaction(ID []byte) (Transaction, error) {
 	}
 
 	return Transaction{}, errors.New("transaction is not found")
+}
+
+// SignTransaction signs inputs of a transaction
+func (bc *Blockchain) SignTransaction(tx *Transaction, privKey ecdsa.PrivateKey) {
+	prevTxs := make(map[string]Transaction)
+
+	for _, vin := range tx.Vin {
+		prevTx, err := bc.FindTransaction(vin.Txid)
+		if err != nil {
+			log.Panic(err)
+		}
+		prevTxs[hex.EncodeToString(prevTx.ID)] = prevTx
+	}
 }
