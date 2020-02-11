@@ -2,12 +2,13 @@ package blockchain
 
 import (
 	"bytes"
-	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
 	"log"
+
+	"golang.org/x/crypto/ripemd160"
 )
 
 type Wallet struct {
@@ -58,7 +59,7 @@ func ValidateAddress(address string) bool {
 func HashPubKey(pubKey []byte) []byte {
 	publicSHA256 := sha256.Sum256(pubKey)
 
-	RIPEMD160Hasher := crypto.RIPEMD160.New()
+	RIPEMD160Hasher := ripemd160.New()
 	_, err := RIPEMD160Hasher.Write(publicSHA256[:])
 	if err != nil {
 		log.Panic(err)
