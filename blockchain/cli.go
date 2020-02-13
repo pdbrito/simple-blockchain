@@ -21,6 +21,8 @@ const (
 	getBalanceUsage       string = "  %s -address <address> - calculate the balance of <address>"
 	sendFlag              string = "send"
 	sendUsage             string = "  %s -from <from> -to <to> -amount <amount> - Send <amount> from <from> to <to>"
+	createWalletFlag      string = "createwallet"
+	createWalletUsage     string = "  %s - generates a new key-pair and saves it into the wallet file"
 )
 
 func (cli *CLI) createBlockchain(address string) {
@@ -35,6 +37,7 @@ func (cli *CLI) printUsage() {
 	fmt.Println(fmt.Sprintf(printChainUsage, printChainFlag))
 	fmt.Println(fmt.Sprintf(getBalanceUsage, getBalanceFlag))
 	fmt.Println(fmt.Sprintf(sendUsage, sendFlag))
+	fmt.Println(fmt.Sprintf(createWalletUsage, createWalletFlag))
 }
 
 func (cli CLI) getBalance(address string) {
@@ -63,6 +66,14 @@ func (cli CLI) send(from, to string, amount int) {
 	fmt.Println("Success!")
 }
 
+func (cli CLI) createWallet() {
+	wallets, _ := NewWallets()
+	address := wallets.CreateWallet()
+	wallets.SaveToFile()
+
+	fmt.Printf("Your new address: %s\n", address)
+}
+
 func (cli *CLI) Run() {
 	if len(os.Args) < 2 {
 		cli.printUsage()
@@ -73,6 +84,7 @@ func (cli *CLI) Run() {
 	printChainCmd := flag.NewFlagSet(printChainFlag, flag.ExitOnError)
 	getBalanceCmd := flag.NewFlagSet(getBalanceFlag, flag.ExitOnError)
 	sendCmd := flag.NewFlagSet(sendFlag, flag.ExitOnError)
+	createWalletCmd := flag.NewFlagSet(createWalletFlag, flag.ExitOnError)
 
 	createBlockchainAddress := createBlockchainCmd.String("address", "", "Recipient of the genesis block reward")
 	getBalanceAddress := getBalanceCmd.String("address", "", "Get the balance of this address")
@@ -98,6 +110,11 @@ func (cli *CLI) Run() {
 		}
 	case sendFlag:
 		err := sendCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case createWalletFlag:
+		err := createWalletCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -139,6 +156,9 @@ func (cli *CLI) Run() {
 			os.Exit(1)
 		}
 		cli.send(*sendFromAddress, *sendToAddress, *sendAmount)
+	}
+	if createWalletCmd.Parsed() {
+		cli.createWallet()
 	}
 }
 
