@@ -43,7 +43,7 @@ func (ws Wallets) GetWallet(address string) Wallet {
 const walletFile string = "wallet.dat"
 
 // LoadFromFile loads wallets from a file on disk
-func (ws Wallets) LoadFromFile() error {
+func (ws *Wallets) LoadFromFile() error {
 	if _, err := os.Stat(walletFile); os.IsNotExist(err) {
 		return err
 	}
