@@ -287,4 +287,6 @@ func (bc *Blockchain) SignTransaction(tx *Transaction, privKey ecdsa.PrivateKey)
 		}
 		prevTxs[hex.EncodeToString(prevTx.ID)] = prevTx
 	}
+
+	tx.Sign(privKey, prevTxs)
 }
