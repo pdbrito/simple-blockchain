@@ -98,6 +98,7 @@ func NewCoinbaseTX(to, data string) *Transaction {
 	return &tx
 }
 
+// NewUTXOTransaction creates a new transaction
 func NewUTXOTransaction(from, to string, amount int, bc *Blockchain) *Transaction {
 	var inputs []TXInput
 	var outputs []TXOutput
