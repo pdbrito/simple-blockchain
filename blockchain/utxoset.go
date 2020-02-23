@@ -72,3 +72,57 @@ func (u UTXOSet) FindUTXO(pubKeyHash []byte) []TXOutput {
 
 	return UTXOs
 }
+
+// Update updates the UTXO set with transactions from the Block.
+// The block is considered to be the tip of a blockchain.
+func (u UTXOSet) Update(block *Block) {
+	db := u.Blockchain.Db
+
+	err := db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(utxoBucket))
+
+		for _, tx := range block.Transactions {
+			if tx.IsCoinbase() == false {
+				for _, vin := range tx.Vin {
+					updatedOuts := TXOutputs{}
+					outsBytes := b.Get(vin.Txid)
+					outs := DeserializeOutputs(outsBytes)
+
+					for outIdx, output := range outs.Ouputs {
+						if outIdx != vin.Vout {
+							updatedOuts.Ouputs = append(updatedOuts.Ouputs, output)
+						}
+					}
+
+					if len(updatedOuts.Ouputs) == 0 {
+						err := b.Delete(vin.Txid)
+						if err != nil {
+							log.Panic(err)
+						}
+					} else {
+						err := b.Put(vin.Txid, updatedOuts.Serialize())
+						if err != nil {
+							log.Panic(err)
+						}
+					}
+				}
+			}
+
+			newOutputs := TXOutputs{}
+			for _, out := range tx.Vout {
+				newOutputs.Ouputs = append(newOutputs.Ouputs, out)
+			}
+
+			err := b.Put(tx.ID, newOutputs.Serialize())
+			if err != nil {
+				log.Panic(err)
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+}
