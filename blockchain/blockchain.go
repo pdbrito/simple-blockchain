@@ -138,8 +138,10 @@ func CreateBlockchain(address string) *Blockchain {
 	return &bc
 }
 
-func (bc Blockchain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
-	var unspentTXs []Transaction
+// FindUTXO finds all unspent transaction outputs and returns transactions with
+// spent outputs removed.
+func (bc Blockchain) FindUTXO() map[string]TXOutputs {
+	UTXO := make(map[string]TXOutputs)
 	spentTXOs := make(map[string][]int)
 	bci := bc.Iterator()
 
@@ -159,38 +161,21 @@ func (bc Blockchain) FindUnspentTransactions(pubKeyHash []byte) []Transaction {
 					}
 				}
 
-				if out.IsLockedWithKey(pubKeyHash) {
-					unspentTXs = append(unspentTXs, *tx)
-				}
+				outs := UTXO[txID]
+				outs.Ouputs = append(outs.Ouputs, out)
+				UTXO[txID] = outs
 			}
 
 			if tx.IsCoinbase() == false {
 				for _, in := range tx.Vin {
-					if in.UsesKey(pubKeyHash) {
-						inTxID := hex.EncodeToString(in.Txid)
-						spentTXOs[inTxID] = append(spentTXOs[inTxID], in.Vout)
-					}
+					inTxID := hex.EncodeToString(in.Txid)
+					spentTXOs[inTxID] = append(spentTXOs[inTxID], in.Vout)
 				}
 			}
 		}
 	}
 
-	return unspentTXs
-}
-
-func (bc Blockchain) FindUTXO(pubKeyHash []byte) []TXOutput {
-	var UTXOs []TXOutput
-	UTXs := bc.FindUnspentTransactions(pubKeyHash)
-
-	for _, tx := range UTXs {
-		for _, out := range tx.Vout {
-			if out.IsLockedWithKey(pubKeyHash) {
-				UTXOs = append(UTXOs, out)
-			}
-		}
-	}
-
-	return UTXOs
+	return UTXO
 }
 
 // FindSpendableOutputs will return a outputs that address can spend to cover amount.
