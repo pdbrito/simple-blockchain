@@ -26,8 +26,15 @@ const (
 )
 
 func (cli *CLI) createBlockchain(address string) {
+	if !ValidateAddress(address) {
+		log.Panic("error: Address is not valid")
+	}
 	bc := CreateBlockchain(address)
-	bc.Db.Close()
+	defer bc.Db.Close()
+
+	UTXOSet := UTXOSet{}
+	UTXOSet.Reindex()
+
 	fmt.Println("Done!")
 }
 
