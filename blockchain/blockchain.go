@@ -20,7 +20,7 @@ type Blockchain struct {
 	Db  *bolt.DB
 }
 
-func (bc *Blockchain) MineBlock(transactions []*Transaction) {
+func (bc *Blockchain) MineBlock(transactions []*Transaction) *Block {
 	var lastHash []byte
 
 	err := bc.Db.View(func(tx *bolt.Tx) error {
@@ -56,6 +56,8 @@ func (bc *Blockchain) MineBlock(transactions []*Transaction) {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	return newBlock
 }
 
 func dbExists() bool {
