@@ -65,7 +65,8 @@ func dbExists() bool {
 	return true
 }
 
-func NewBlockchain(address string) *Blockchain {
+// NewBlockchain creates a new Blockchain with genesis Block
+func NewBlockchain() *Blockchain {
 	if !dbExists() {
 		fmt.Println("No existing blockchain found. Create one first")
 		os.Exit(1)
