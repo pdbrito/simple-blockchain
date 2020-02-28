@@ -65,11 +65,16 @@ func (cli CLI) getBalance(address string) {
 }
 
 func (cli CLI) send(from, to string, amount int) {
-	bc := NewBlockchain(from)
+	bc := NewBlockchain()
+	UTXOSet := UTXOSet{bc}
 	defer bc.Db.Close()
 
-	tx := NewUTXOTransaction(from, to, amount, bc)
-	bc.MineBlock([]*Transaction{tx})
+	tx := NewUTXOTransaction(from, to, amount, &UTXOSet)
+	cbTX := NewCoinbaseTX(from, "")
+	txs := []*Transaction{cbTX, tx}
+
+	newBlock := bc.MineBlock(txs)
+	UTXOSet.Update(newBlock)
 	fmt.Println("Success!")
 }
 
