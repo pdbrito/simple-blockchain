@@ -32,7 +32,7 @@ func (cli *CLI) createBlockchain(address string) {
 	bc := CreateBlockchain(address)
 	defer bc.Db.Close()
 
-	UTXOSet := UTXOSet{}
+	UTXOSet := UTXOSet{bc}
 	UTXOSet.Reindex()
 
 	fmt.Println("Done!")
