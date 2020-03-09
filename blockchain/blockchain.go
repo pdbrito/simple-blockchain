@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-const dbFile = "blockchain.db"
+const dbFile = "blockchain_%s.db"
 const blocksBucket = "blocks"
 const genesisCoinbaseData string = "I find your lack of faith disturbing"
 
@@ -68,7 +68,8 @@ func dbExists() bool {
 }
 
 // NewBlockchain creates a new Blockchain with genesis Block
-func NewBlockchain() *Blockchain {
+func NewBlockchain(nodeID string) *Blockchain {
+	dbFile := fmt.Sprintf(dbFile, nodeID)
 	if !dbExists() {
 		fmt.Println("No existing blockchain found. Create one first")
 		os.Exit(1)
