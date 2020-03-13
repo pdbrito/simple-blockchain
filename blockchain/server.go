@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"io"
 	"log"
 	"net"
 )
@@ -74,4 +75,28 @@ func commandToBytes(command string) []byte {
 	}
 
 	return bytes[:]
+}
+
+func sendData(addr string, data []byte) {
+	conn, err := net.Dial(protocol, addr)
+	if err != nil {
+		fmt.Printf("%s is not available\n", addr)
+		var updatedNodes []string
+
+		for _, node := range knownNodes {
+			if node != addr {
+				updatedNodes = append(updatedNodes, node)
+			}
+		}
+
+		knownNodes = updatedNodes
+
+		return
+	}
+	defer conn.Close()
+
+	_, err = io.Copy(conn, bytes.NewReader(data))
+	if err != nil {
+		log.Panic(err)
+	}
 }
