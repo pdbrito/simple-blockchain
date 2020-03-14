@@ -77,6 +77,18 @@ func commandToBytes(command string) []byte {
 	return bytes[:]
 }
 
+func bytesToCommand(bytes []byte) string {
+	var command []byte
+
+	for _, b := range bytes {
+		if b != 0x0 {
+			command = append(command, b)
+		}
+	}
+
+	return fmt.Sprintf("%s", command)
+}
+
 func sendData(addr string, data []byte) {
 	conn, err := net.Dial(protocol, addr)
 	if err != nil {
