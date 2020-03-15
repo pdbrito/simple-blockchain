@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net"
 )
@@ -110,5 +111,19 @@ func sendData(addr string, data []byte) {
 	_, err = io.Copy(conn, bytes.NewReader(data))
 	if err != nil {
 		log.Panic(err)
+	}
+}
+
+func handleConnection(conn net.Conn, bc *Blockchain) {
+	req, err := ioutil.ReadAll(conn)
+	if err != nil {
+		log.Panic(err)
+	}
+	command := bytesToCommand(req[:commandLength])
+	fmt.Printf("Received %s command\n", command)
+
+	switch command {
+	default:
+		fmt.Println("Unknown command!")
 	}
 }
