@@ -114,6 +114,16 @@ func sendData(addr string, data []byte) {
 	}
 }
 
+type getblocks struct {
+	AddrFrom string
+}
+
+func sendGetBlocks(address string) {
+	payload := gobEncode(getblocks{nodeAddress})
+	request := append(commandToBytes("getblocks"), payload...)
+
+	sendData(address, request)
+}
 func handleConnection(conn net.Conn, bc *Blockchain) {
 	req, err := ioutil.ReadAll(conn)
 	if err != nil {
