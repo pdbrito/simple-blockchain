@@ -124,6 +124,16 @@ func sendGetBlocks(address string) {
 
 	sendData(address, request)
 }
+
+func nodeIsKnown(addr string) bool {
+	for _, node := range knownNodes {
+		if node == addr {
+			return true
+		}
+	}
+
+	return false
+}
 func handleConnection(conn net.Conn, bc *Blockchain) {
 	req, err := ioutil.ReadAll(conn)
 	if err != nil {
