@@ -134,6 +134,32 @@ func nodeIsKnown(addr string) bool {
 
 	return false
 }
+
+func handleVersion(request []byte, bc *Blockchain) {
+	var buff bytes.Buffer
+	var payload verzion
+
+	buff.Write(request[commandLength:])
+	dec := gob.NewDecoder(&buff)
+	err := dec.Decode(&payload)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	myBestHeight := bc.GetBestHeight()
+	foreignerBestHeight := payload.BestHeight
+
+	if myBestHeight < foreignerBestHeight {
+		sendGetBlocks(payload.AddrFrom)
+	} else if myBestHeight > foreignerBestHeight {
+		sendVersion(payload.AddrFrom, bc)
+	}
+
+	if !nodeIsKnown(payload.AddrFrom) {
+		knownNodes = append(knownNodes, payload.AddrFrom)
+	}
+}
+
 func handleConnection(conn net.Conn, bc *Blockchain) {
 	req, err := ioutil.ReadAll(conn)
 	if err != nil {
@@ -143,6 +169,8 @@ func handleConnection(conn net.Conn, bc *Blockchain) {
 	fmt.Printf("Received %s command\n", command)
 
 	switch command {
+	case "version":
+		handleVersion(req, bc)
 	default:
 		fmt.Println("Unknown command!")
 	}
