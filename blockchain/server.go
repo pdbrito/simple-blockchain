@@ -174,4 +174,6 @@ func handleConnection(conn net.Conn, bc *Blockchain) {
 	default:
 		fmt.Println("Unknown command!")
 	}
+
+	conn.Close()
 }
