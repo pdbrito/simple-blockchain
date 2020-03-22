@@ -148,6 +148,20 @@ func nodeIsKnown(addr string) bool {
 	return false
 }
 
+func handleGetBlocks(request []byte, bc *Blockchain) {
+	var buff bytes.Buffer
+	var payload getblocks
+
+	buff.Write(request[commandLength:])
+	dec := gob.NewDecoder(&buff)
+	err := dec.Decode(&payload)
+	if err != nil {
+		log.Panic(err)
+	}
+	blocks := bc.GetBlockHashes()
+	sendInv(payload.AddrFrom, "block", blocks)
+}
+
 func handleVersion(request []byte, bc *Blockchain) {
 	var buff bytes.Buffer
 	var payload verzion
