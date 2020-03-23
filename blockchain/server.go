@@ -198,6 +198,8 @@ func handleConnection(conn net.Conn, bc *Blockchain) {
 	switch command {
 	case "version":
 		handleVersion(req, bc)
+	case "getblocks":
+		handleGetBlocks(req, bc)
 	default:
 		fmt.Println("Unknown command!")
 	}
