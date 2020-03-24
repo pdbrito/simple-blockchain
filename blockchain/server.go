@@ -120,6 +120,12 @@ type inv struct {
 	Items    [][]byte
 }
 
+type getdata struct {
+	AddrFrom string
+	Type     string
+	ID       []byte
+}
+
 func sendInv(address, kind string, items [][]byte) {
 	inventory := inv{nodeAddress, kind, items}
 	payload := gobEncode(inventory)
@@ -134,6 +140,13 @@ type getblocks struct {
 func sendGetBlocks(address string) {
 	payload := gobEncode(getblocks{nodeAddress})
 	request := append(commandToBytes("getblocks"), payload...)
+
+	sendData(address, request)
+}
+
+func sendGetData(address, kind string, id []byte) {
+	payload := gobEncode(getdata{nodeAddress, kind, id})
+	request := append(commandToBytes("getdata"), payload...)
 
 	sendData(address, request)
 }
