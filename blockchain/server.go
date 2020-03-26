@@ -3,6 +3,7 @@ package blockchain
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -23,6 +24,8 @@ const commandLength = 12
 var nodeAddress string
 var miningAddress string
 var knownNodes = []string{"localhost:3000"}
+var blocksInTransit = [][]byte{}
+var mempool = make(map[string]Transaction)
 
 // StartServer starts a node
 func StartServer(nodeID, minerAddress string) {
@@ -197,6 +200,43 @@ func handleVersion(request []byte, bc *Blockchain) {
 
 	if !nodeIsKnown(payload.AddrFrom) {
 		knownNodes = append(knownNodes, payload.AddrFrom)
+	}
+}
+
+func handleInv(request []byte, bc *Blockchain) {
+	var buff bytes.Buffer
+	var payload inv
+
+	buff.Write(request[commandLength:])
+	dec := gob.NewDecoder(&buff)
+	err := dec.Decode(&payload)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	fmt.Printf("Received inventory with %d %s\n", len(payload.Items), payload.Type)
+
+	if payload.Type == "block" {
+		blocksInTransit := payload.Items
+
+		blockHash := payload.Items[0]
+		sendGetData(payload.AddrFrom, "block", blockHash)
+
+		newInTransit := [][]byte{}
+		for _, b := range blocksInTransit {
+			if bytes.Compare(b, blockHash) != 0 {
+				newInTransit = append(newInTransit, b)
+			}
+		}
+		blocksInTransit = newInTransit
+	}
+
+	if payload.Type == "tx" {
+		txID := payload.Items[0]
+
+		if mempool[hex.EncodeToString(txID)].ID == nil {
+			sendGetData(payload.AddrFrom, "tx", txID)
+		}
 	}
 }
 
