@@ -154,6 +154,19 @@ func sendGetData(address, kind string, id []byte) {
 	sendData(address, request)
 }
 
+type block struct {
+	AddrFrom string
+	Block    []byte
+}
+
+func sendBlock(addr string, b *Block) {
+	data := block{nodeAddress, b.Serialize()}
+	payload := gobEncode(data)
+	request := append(commandToBytes("block"), payload...)
+
+	sendData(addr, request)
+}
+
 func nodeIsKnown(addr string) bool {
 	for _, node := range knownNodes {
 		if node == addr {
