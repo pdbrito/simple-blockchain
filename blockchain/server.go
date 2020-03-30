@@ -167,6 +167,19 @@ func sendBlock(addr string, b *Block) {
 	sendData(addr, request)
 }
 
+type tx struct {
+	AddrFrom    string
+	Transaction []byte
+}
+
+func sendTx(addr string, tnx *Transaction) {
+	data := tx{nodeAddress, tnx.Serialize()}
+	payload := gobEncode(data)
+	request := append(commandToBytes("tx"), payload...)
+
+	sendData(addr, request)
+}
+
 func nodeIsKnown(addr string) bool {
 	for _, node := range knownNodes {
 		if node == addr {
