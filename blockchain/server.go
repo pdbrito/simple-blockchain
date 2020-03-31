@@ -266,6 +266,34 @@ func handleInv(request []byte, bc *Blockchain) {
 	}
 }
 
+func handleGetData(request []byte, bc *Blockchain) {
+	var buff bytes.Buffer
+	var payload getdata
+
+	buff.Write(request[commandLength:])
+	dec := gob.NewDecoder(&buff)
+	err := dec.Decode(&payload)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if payload.Type == "block" {
+		block, err := bc.GetBlock([]byte(payload.ID))
+		if err != nil {
+			return
+		}
+
+		sendBlock(payload.AddrFrom, &block)
+	}
+
+	if payload.Type == "tx" {
+		txID := hex.EncodeToString(payload.ID)
+		tx := mempool[txID]
+
+		sendTx(payload.AddrFrom, &tx)
+	}
+}
+
 func handleConnection(conn net.Conn, bc *Blockchain) {
 	req, err := ioutil.ReadAll(conn)
 	if err != nil {
