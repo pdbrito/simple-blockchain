@@ -307,6 +307,8 @@ func handleConnection(conn net.Conn, bc *Blockchain) {
 		handleVersion(req, bc)
 	case "getblocks":
 		handleGetBlocks(req, bc)
+	case "getdata":
+		handleGetData(req, bc)
 	case "inv":
 		handleInv(req, bc)
 	default:
