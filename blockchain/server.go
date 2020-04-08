@@ -400,6 +400,8 @@ func handleConnection(conn net.Conn, bc *Blockchain) {
 	switch command {
 	case "version":
 		handleVersion(req, bc)
+	case "tx":
+		handleTx(req, bc)
 	case "block":
 		handleBlock(req, bc)
 	case "getblocks":
