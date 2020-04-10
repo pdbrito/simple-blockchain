@@ -363,7 +363,7 @@ func handleTx(request []byte, bc *Blockchain) {
 			}
 
 			cbTx := NewCoinbaseTX(miningAddress, "")
-			txs := append(txs, cbTx)
+			txs = append(txs, cbTx)
 
 			newBlock := bc.MineBlock(txs)
 			UTXOSet := UTXOSet{bc}
