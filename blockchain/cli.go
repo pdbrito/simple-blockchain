@@ -47,11 +47,11 @@ func (cli *CLI) printUsage() {
 	fmt.Println(fmt.Sprintf(createWalletUsage, createWalletFlag))
 }
 
-func (cli CLI) getBalance(address string) {
+func (cli CLI) getBalance(address string, nodeID string) {
 	if !ValidateAddress(address) {
 		log.Panic("error: address is not valid")
 	}
-	bc := NewBlockchain()
+	bc := NewBlockchain(nodeID)
 	UTXOSet := UTXOSet{bc}
 	defer bc.Db.Close()
 
@@ -90,6 +90,12 @@ func (cli CLI) createWallet() {
 func (cli *CLI) Run() {
 	if len(os.Args) < 2 {
 		cli.printUsage()
+		os.Exit(1)
+	}
+
+	nodeID := os.Getenv("NODE_ID")
+	if nodeID == "" {
+		fmt.Printf("NODE_ID env. var is not set!")
 		os.Exit(1)
 	}
 
@@ -153,7 +159,7 @@ func (cli *CLI) Run() {
 			getBalanceCmd.Usage()
 			os.Exit(1)
 		}
-		cli.getBalance(*getBalanceAddress)
+		cli.getBalance(*getBalanceAddress, nodeID)
 	}
 	if sendCmd.Parsed() {
 		if *sendFromAddress == "" {
