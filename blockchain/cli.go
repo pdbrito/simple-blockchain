@@ -151,7 +151,7 @@ func (cli *CLI) Run() {
 	}
 
 	if printChainCmd.Parsed() {
-		cli.printChain()
+		cli.printChain(nodeID)
 	}
 
 	if getBalanceCmd.Parsed() {
@@ -181,8 +181,8 @@ func (cli *CLI) Run() {
 	}
 }
 
-func (cli CLI) printChain() {
-	bc := NewBlockchain()
+func (cli CLI) printChain(nodeID string) {
+	bc := NewBlockchain(nodeID)
 	defer bc.Db.Close()
 
 	bci := bc.Iterator()
