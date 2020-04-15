@@ -181,7 +181,7 @@ func (cli *CLI) Run() {
 			sendCmd.Usage()
 			os.Exit(1)
 		}
-		cli.send(*sendFromAddress, *sendToAddress, *sendAmount)
+		cli.send(*sendFromAddress, *sendToAddress, *sendAmount, nodeID)
 	}
 	if createWalletCmd.Parsed() {
 		cli.createWallet()
