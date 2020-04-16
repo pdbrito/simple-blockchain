@@ -25,11 +25,11 @@ const (
 	createWalletUsage     string = "  %s - generates a new key-pair and saves it into the wallet file"
 )
 
-func (cli *CLI) createBlockchain(address string) {
+func (cli *CLI) createBlockchain(address, nodeID string) {
 	if !ValidateAddress(address) {
 		log.Panic("error: Address is not valid")
 	}
-	bc := CreateBlockchain(address)
+	bc := CreateBlockchain(address, nodeID)
 	defer bc.Db.Close()
 
 	UTXOSet := UTXOSet{bc}
@@ -154,7 +154,7 @@ func (cli *CLI) Run() {
 			createBlockchainCmd.Usage()
 			os.Exit(1)
 		}
-		cli.createBlockchain(*createBlockchainAddress)
+		cli.createBlockchain(*createBlockchainAddress, nodeID)
 	}
 
 	if printChainCmd.Parsed() {
