@@ -86,10 +86,10 @@ func (cli CLI) send(from, to string, amount int, nodeID string) {
 	fmt.Println("Success!")
 }
 
-func (cli CLI) createWallet() {
-	wallets, _ := NewWallets()
+func (cli CLI) createWallet(nodeID string) {
+	wallets, _ := NewWallets(nodeID)
 	address := wallets.CreateWallet()
-	wallets.SaveToFile()
+	wallets.SaveToFile(nodeID)
 
 	fmt.Printf("Your new address: %s\n", address)
 }
@@ -184,7 +184,7 @@ func (cli *CLI) Run() {
 		cli.send(*sendFromAddress, *sendToAddress, *sendAmount, nodeID)
 	}
 	if createWalletCmd.Parsed() {
-		cli.createWallet()
+		cli.createWallet(nodeID)
 	}
 }
 
