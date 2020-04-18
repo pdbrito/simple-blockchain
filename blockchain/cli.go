@@ -169,15 +169,7 @@ func (cli *CLI) Run() {
 		cli.getBalance(*getBalanceAddress, nodeID)
 	}
 	if sendCmd.Parsed() {
-		if *sendFromAddress == "" {
-			sendCmd.Usage()
-			os.Exit(1)
-		}
-		if *sendToAddress == "" {
-			sendCmd.Usage()
-			os.Exit(1)
-		}
-		if *sendAmount == 0 {
+		if *sendFromAddress == "" || *sendToAddress == "" || *sendAmount == 0 {
 			sendCmd.Usage()
 			os.Exit(1)
 		}
