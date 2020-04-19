@@ -67,8 +67,9 @@ func (ws *Wallets) LoadFromFile(nodeID string) error {
 }
 
 // SaveToFile saves wallets to a file
-func (ws Wallets) SaveToFile() {
+func (ws Wallets) SaveToFile(nodeID string) {
 	var content bytes.Buffer
+	walletFile := fmt.Sprintf(walletFile, nodeID)
 
 	gob.Register(elliptic.P256())
 
