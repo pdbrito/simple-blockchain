@@ -23,6 +23,8 @@ const (
 	sendUsage             string = "  %s -from <from> -to <to> -amount <amount> - Send <amount> from <from> to <to>"
 	createWalletFlag      string = "createwallet"
 	createWalletUsage     string = "  %s - generates a new key-pair and saves it into the wallet file"
+	reindexUTXOFlag       string = "reindexutxo"
+	reindexUTXOUsage      string = "  %s - Rebuilds the UTXO set"
 )
 
 func (cli *CLI) createBlockchain(address, nodeID string) {
@@ -45,6 +47,7 @@ func (cli *CLI) printUsage() {
 	fmt.Println(fmt.Sprintf(getBalanceUsage, getBalanceFlag))
 	fmt.Println(fmt.Sprintf(sendUsage, sendFlag))
 	fmt.Println(fmt.Sprintf(createWalletUsage, createWalletFlag))
+	fmt.Println(fmt.Sprintf(reindexUTXOUsage, reindexUTXOFlag))
 }
 
 func (cli CLI) getBalance(address string, nodeID string) {
@@ -94,6 +97,12 @@ func (cli CLI) createWallet(nodeID string) {
 	fmt.Printf("Your new address: %s\n", address)
 }
 
+func (cli *CLI) reindexUTXO(nodeID string) {
+	bc := NewBlockchain(nodeID)
+	UTXOSet := UTXOSet{bc}
+	UTXOSet.Reindex()
+}
+
 func (cli *CLI) Run() {
 	if len(os.Args) < 2 {
 		cli.printUsage()
@@ -111,6 +120,7 @@ func (cli *CLI) Run() {
 	getBalanceCmd := flag.NewFlagSet(getBalanceFlag, flag.ExitOnError)
 	sendCmd := flag.NewFlagSet(sendFlag, flag.ExitOnError)
 	createWalletCmd := flag.NewFlagSet(createWalletFlag, flag.ExitOnError)
+	reindexUTXOCmd := flag.NewFlagSet(reindexUTXOFlag, flag.ExitOnError)
 
 	createBlockchainAddress := createBlockchainCmd.String("address", "", "Recipient of the genesis block reward")
 	getBalanceAddress := getBalanceCmd.String("address", "", "Get the balance of this address")
@@ -141,6 +151,11 @@ func (cli *CLI) Run() {
 		}
 	case createWalletFlag:
 		err := createWalletCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case reindexUTXOFlag:
+		err := reindexUTXOCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -177,6 +192,9 @@ func (cli *CLI) Run() {
 	}
 	if createWalletCmd.Parsed() {
 		cli.createWallet(nodeID)
+	}
+	if reindexUTXOCmd.Parsed() {
+		cli.reindexUTXO(nodeID)
 	}
 }
 
