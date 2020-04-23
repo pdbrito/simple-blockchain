@@ -68,7 +68,7 @@ func (cli CLI) getBalance(address string, nodeID string) {
 	fmt.Printf("Balance of `%s` is `%d`\n", address, balance)
 }
 
-func (cli CLI) send(from, to string, amount int, nodeID string) {
+func (cli CLI) send(from, to string, amount int, nodeID string, mineNow bool) {
 	if !ValidateAddress(from) {
 		log.Panic("ERROR: Sender address is not valid")
 	}
@@ -80,12 +80,24 @@ func (cli CLI) send(from, to string, amount int, nodeID string) {
 	UTXOSet := UTXOSet{bc}
 	defer bc.Db.Close()
 
-	tx := NewUTXOTransaction(from, to, amount, &UTXOSet)
-	cbTX := NewCoinbaseTX(from, "")
-	txs := []*Transaction{cbTX, tx}
+	wallets, err := NewWallets(nodeID)
+	if err != nil {
+		log.Panic(err)
+	}
+	wallet := wallets.GetWallet(from)
 
-	newBlock := bc.MineBlock(txs)
-	UTXOSet.Update(newBlock)
+	tx := NewUTXOTransaction(&wallet, to, amount, &UTXOSet)
+
+	if mineNow {
+		cbTx := NewCoinbaseTX(from, "")
+		txs := []*Transaction{cbTx, tx}
+
+		newBlock := bc.MineBlock(txs)
+		UTXOSet.Update(newBlock)
+	} else {
+		sendTx(knownNodes[0], tx)
+	}
+
 	fmt.Println("Success!")
 }
 
@@ -127,6 +139,7 @@ func (cli *CLI) Run() {
 	sendFromAddress := sendCmd.String("fromAddress", "", "Address to take funds from")
 	sendToAddress := sendCmd.String("toAddress", "", "Address to send funds to")
 	sendAmount := sendCmd.Int("amount", 0, "Amount to transfer")
+	sendMine := sendCmd.Bool("mine", false, "Mine immediately on the same node")
 
 	switch os.Args[1] {
 	case createBlockchainFlag:
@@ -188,7 +201,7 @@ func (cli *CLI) Run() {
 			sendCmd.Usage()
 			os.Exit(1)
 		}
-		cli.send(*sendFromAddress, *sendToAddress, *sendAmount, nodeID)
+		cli.send(*sendFromAddress, *sendToAddress, *sendAmount, nodeID, *sendMine)
 	}
 	if createWalletCmd.Parsed() {
 		cli.createWallet(nodeID)
