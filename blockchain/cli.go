@@ -25,6 +25,8 @@ const (
 	createWalletUsage     string = "  %s - generates a new key-pair and saves it into the wallet file"
 	reindexUTXOFlag       string = "reindexutxo"
 	reindexUTXOUsage      string = "  %s - Rebuilds the UTXO set"
+	startNodeFlag         string = "startnode"
+	startNodeUsage        string = "  %s -miner <address> -Start a node with ID specified in NODE_ID env var -miner enabled mining"
 )
 
 func (cli *CLI) createBlockchain(address, nodeID string) {
