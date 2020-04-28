@@ -136,6 +136,7 @@ func (cli *CLI) Run() {
 	sendCmd := flag.NewFlagSet(sendFlag, flag.ExitOnError)
 	createWalletCmd := flag.NewFlagSet(createWalletFlag, flag.ExitOnError)
 	reindexUTXOCmd := flag.NewFlagSet(reindexUTXOFlag, flag.ExitOnError)
+	startNodeCmd := flag.NewFlagSet(startNodeFlag, flag.ExitOnError)
 
 	createBlockchainAddress := createBlockchainCmd.String("address", "", "Recipient of the genesis block reward")
 	getBalanceAddress := getBalanceCmd.String("address", "", "Get the balance of this address")
@@ -143,6 +144,7 @@ func (cli *CLI) Run() {
 	sendToAddress := sendCmd.String("toAddress", "", "Address to send funds to")
 	sendAmount := sendCmd.Int("amount", 0, "Amount to transfer")
 	sendMine := sendCmd.Bool("mine", false, "Mine immediately on the same node")
+	startNodeMiner := startNodeCmd.String("miner", "", "Enable mining mode and send reward to ADDRESS")
 
 	switch os.Args[1] {
 	case createBlockchainFlag:
@@ -172,6 +174,11 @@ func (cli *CLI) Run() {
 		}
 	case reindexUTXOFlag:
 		err := reindexUTXOCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case startNodeFlag:
+		err := startNodeCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -212,6 +219,26 @@ func (cli *CLI) Run() {
 	if reindexUTXOCmd.Parsed() {
 		cli.reindexUTXO(nodeID)
 	}
+	if startNodeCmd.Parsed() {
+		nodeID := os.Getenv("NODE_ID")
+		if nodeID == "" {
+			startNodeCmd.Usage()
+			os.Exit(1)
+		}
+		cli.startNode(nodeID, *startNodeMiner)
+	}
+}
+
+func (cli *CLI) startNode(nodeId, minerAddress string) {
+	fmt.Printf("Starting node %s\n", nodeID)
+	if len(minerAddress) > 0 {
+		if ValidateAddress(minerAddress) {
+			fmt.Println("Mining is on. Address to receive rewards: ", minerAddress)
+		} else {
+			log.Panic("Invalid miner address!")
+		}
+	}
+	StartServer(nodeId, minerAddress)
 }
 
 func (cli CLI) printChain(nodeID string) {
