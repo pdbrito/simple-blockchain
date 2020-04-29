@@ -230,7 +230,7 @@ func (cli *CLI) Run() {
 }
 
 func (cli *CLI) startNode(nodeId, minerAddress string) {
-	fmt.Printf("Starting node %s\n", nodeID)
+	fmt.Printf("Starting node %s\n", nodeId)
 	if len(minerAddress) > 0 {
 		if ValidateAddress(minerAddress) {
 			fmt.Println("Mining is on. Address to receive rewards: ", minerAddress)
