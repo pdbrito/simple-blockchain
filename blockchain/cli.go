@@ -20,7 +20,7 @@ const (
 	getBalanceFlag        string = "getbalance"
 	getBalanceUsage       string = "  %s -address <address> - calculate the balance of <address>"
 	sendFlag              string = "send"
-	sendUsage             string = "  %s -from <from> -to <to> -amount <amount> - Send <amount> from <from> to <to>"
+	sendUsage             string = "  %s -from <from> -to <to> -amount <amount> -mine - Send <amount> from <from> to <to>. Mine on the same node, when -mine is set."
 	createWalletFlag      string = "createwallet"
 	createWalletUsage     string = "  %s - generates a new key-pair and saves it into the wallet file"
 	reindexUTXOFlag       string = "reindexutxo"
