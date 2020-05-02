@@ -53,6 +53,7 @@ func (cli *CLI) printUsage() {
 	fmt.Println(fmt.Sprintf(createWalletUsage, createWalletFlag))
 	fmt.Println(fmt.Sprintf(reindexUTXOUsage, reindexUTXOFlag))
 	fmt.Println(fmt.Sprintf(startNodeUsage, startNodeFlag))
+	fmt.Println(fmt.Sprintf(listAddressesUsage, listAddressesFlag))
 }
 
 func (cli CLI) getBalance(address string, nodeID string) {
