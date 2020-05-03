@@ -140,6 +140,7 @@ func (cli *CLI) Run() {
 	createWalletCmd := flag.NewFlagSet(createWalletFlag, flag.ExitOnError)
 	reindexUTXOCmd := flag.NewFlagSet(reindexUTXOFlag, flag.ExitOnError)
 	startNodeCmd := flag.NewFlagSet(startNodeFlag, flag.ExitOnError)
+	listAddressesCmd := flag.NewFlagSet(listAddressesFlag, flag.ExitOnError)
 
 	createBlockchainAddress := createBlockchainCmd.String("address", "", "Recipient of the genesis block reward")
 	getBalanceAddress := getBalanceCmd.String("address", "", "Get the balance of this address")
