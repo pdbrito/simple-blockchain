@@ -186,6 +186,11 @@ func (cli *CLI) Run() {
 		if err != nil {
 			log.Panic(err)
 		}
+	case listAddressesFlag:
+		err := listAddressesCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
 	default:
 		cli.printUsage()
 		os.Exit(1)
