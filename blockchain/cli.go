@@ -236,6 +236,9 @@ func (cli *CLI) Run() {
 		}
 		cli.startNode(nodeID, *startNodeMiner)
 	}
+	if listAddressesCmd.Parsed() {
+		cli.listAddresses(nodeID)
+	}
 }
 
 func (cli *CLI) startNode(nodeId, minerAddress string) {
