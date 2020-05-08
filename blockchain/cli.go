@@ -144,8 +144,8 @@ func (cli *CLI) Run() {
 
 	createBlockchainAddress := createBlockchainCmd.String("address", "", "Recipient of the genesis block reward")
 	getBalanceAddress := getBalanceCmd.String("address", "", "Get the balance of this address")
-	sendFromAddress := sendCmd.String("fromAddress", "", "Address to take funds from")
-	sendToAddress := sendCmd.String("toAddress", "", "Address to send funds to")
+	sendFromAddress := sendCmd.String("from", "", "Address to take funds from")
+	sendToAddress := sendCmd.String("to", "", "Address to send funds to")
 	sendAmount := sendCmd.Int("amount", 0, "Amount to transfer")
 	sendMine := sendCmd.Bool("mine", false, "Mine immediately on the same node")
 	startNodeMiner := startNodeCmd.String("miner", "", "Enable mining mode and send reward to ADDRESS")
