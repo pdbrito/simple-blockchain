@@ -78,6 +78,7 @@ func dbExists() bool {
 func NewBlockchain(nodeID string) *Blockchain {
 	dbFile := fmt.Sprintf(dbFile, nodeID)
 	if !dbExists() {
+		fmt.Printf("could not find blockchain db file: %s\n", dbFile)
 		fmt.Println("No existing blockchain found. Create one first")
 		os.Exit(1)
 	}
