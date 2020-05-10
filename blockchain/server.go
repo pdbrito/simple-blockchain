@@ -30,6 +30,7 @@ var mempool = make(map[string]Transaction)
 // StartServer starts a node
 func StartServer(nodeID, minerAddress string) {
 	nodeAddress = fmt.Sprintf("localhost:%s", nodeID)
+	fmt.Printf("Listening on: %s\n", nodeAddress)
 	miningAddress = minerAddress
 	ln, err := net.Listen(protocol, nodeAddress)
 	if err != nil {
